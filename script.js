@@ -5,8 +5,8 @@ const form = document.getElementById('item-form');
 const itemInput = document.getElementById('item-input');
 //3.list
 const itemList = document.getElementById('item-list');
-//4.button
-const btn = document.querySelector('.btn');
+//4.removeIcon
+const items = document.querySelectorAll('li');
 
 //Function to create icon
 function newIcon(iconClass) {
@@ -57,5 +57,21 @@ function onSubmit(e) {
   newListItem();
 }
 
+//Function to remove individual item
+function onClick(e) {
+  //console.log(e.target);
+  //console.log(e.currentTarget);
+  if (e.target.classList.contains('fa-solid')) {
+    const i = e.target.parentElement.parentElement;
+    console.log(i);
+    i.remove();
+  }
+  return;
+}
+
 //Add eventListener in form element
-btn.addEventListener('click', onSubmit);
+form.addEventListener('click', onSubmit);
+itemList.addEventListener('click', onClick);
+
+
+//
