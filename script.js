@@ -5,8 +5,8 @@ const form = document.getElementById('item-form');
 const itemInput = document.getElementById('item-input');
 //3.list
 const itemList = document.getElementById('item-list');
-//4.removeIcon
-const items = document.querySelectorAll('li');
+//4.clear all button
+const clrBtn = document.getElementById('clear');
 
 //Function to create icon
 function newIcon(iconClass) {
@@ -33,12 +33,9 @@ function newListItem() {
     'remove-item btn-link text-red'
   );
   newListItem.append(iconButtonElement);
+  console.log(itemList);
   //append new list item to the 'ul' list at the top
   itemList.append(newListItem);
-
-  //append new item to the top of the list
-  //   const siblingItem = document.querySelector('li:first-child');
-  //   itemList.insertBefore(newListItem, siblingItem);
 
   //clear the input field
   itemInput.value = '';
@@ -46,32 +43,41 @@ function newListItem() {
 //Function for onSubmit event
 function onSubmit(e) {
   e.preventDefault();
-
   const newItemValue = itemInput.value;
-  //validate the input field
-  if (newItemValue === '') {
-    alert('Please enter an item.');
-    return;
+  const btnClick = e.target.classList.contains('btn');
+
+  if (newItemValue === '' && btnClick) {
+    alert('Please enter value');
+  } else if (newItemValue !== '' && btnClick) {
+    newListItem();
   }
-  //invoke new item list function
-  newListItem();
 }
 
 //Function to remove individual item
 function onClick(e) {
-  //console.log(e.target);
-  //console.log(e.currentTarget);
   if (e.target.classList.contains('fa-solid')) {
     const i = e.target.parentElement.parentElement;
-    console.log(i);
     i.remove();
+    console.log(itemList);
   }
   return;
 }
 
-//Add eventListener in form element
+//Function to clear all items from the list
+function onBtnClick() {
+  // const list = document.querySelectorAll('li');
+  // list.forEach((item) => {
+  //   item.remove();
+  // });
+  // itemList.innerHTML = '';
+  while (itemList.firstChild) {
+    itemList.removeChild(itemList.firstChild);
+  }
+}
+
+//Add eventListener to elements
 form.addEventListener('click', onSubmit);
 itemList.addEventListener('click', onClick);
-
+clrBtn.addEventListener('click', onBtnClick);
 
 //
