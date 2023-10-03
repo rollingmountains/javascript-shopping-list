@@ -15,8 +15,7 @@ const container = document.querySelector('.container');
 //Function to display items on page load
 function displayItems() {
   const getItems = getItemsFromStorage();
-  console.log(typeof getItems);
-  // getItems.forEach((item)=> addItemToDOM(item))
+  getItems.forEach((item) => addItemToDOM(item));
 }
 
 //Function to clear elements
@@ -102,20 +101,53 @@ function onAddItemSubmit(e) {
   addItemToStorage(newItemValue);
 }
 
-//Function to remove individual item
-function onClick(e) {
+//Function to  remove item
+function onClickItem(e) {
   if (e.target.classList.contains('fa-solid')) {
-    const i = e.target.parentElement.parentElement;
-    i.remove();
+    removeItem(e.target.parentElement.parentElement);
   }
   clearUI();
 }
 
+//Function to remove individual item
+function removeItem(item) {
+  if (confirm('Are you sure?')) {
+    // remove item from DOM
+    item.remove();
+    // remove item from storage
+    removeItemFromStorage(item.textContent);
+    clearUI();
+  }
+}
+
+//Function to remove Item from storage
+function removeItemFromStorage(item) {
+  let itemFromStorage = getItemsFromStorage();
+
+  itemFromStorage = itemFromStorage.filter((i) => i !== item);
+
+  //reset to local storage
+  localStorage.setItem('items', JSON.stringify(itemFromStorage));
+
+  //remove local storage 'items' if it's empty
+
+  if (itemFromStorage.length === 0) {
+    localStorage.clear();
+  }
+  console.log(localStorage.getItem('items'));
+}
+
+//Function to remove all items from storage
+function removeAllItemsFromStorage() {
+  localStorage.removeItem('items');
+}
+
 //Function to clear all items from the list
-function onBtnClick() {
+function clearAllItems() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+  removeAllItemsFromStorage();
   clearUI();
 }
 
@@ -137,8 +169,8 @@ function init() {
   //Add eventListener to elements
   form.addEventListener('submit', onAddItemSubmit);
   filter.addEventListener('input', onFilter);
-  itemList.addEventListener('click', onClick);
-  clrBtn.addEventListener('click', onBtnClick);
+  itemList.addEventListener('click', onClickItem);
+  clrBtn.addEventListener('click', clearAllItems);
   document.addEventListener('DOMContentLoaded', displayItems());
 
   //Function to clear UI on page load
