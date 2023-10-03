@@ -34,6 +34,10 @@ header h1 {
   padding: 20px;
 }
 
+.edit-mode {
+  color: #ccc;
+}
+
 /* Form & Input */
 .form-input {
   width: 100%;
@@ -132,3 +136,4 @@ header h1 {
 .visible {
   display: block;
 }
+

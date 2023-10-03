@@ -11,17 +11,16 @@ const clrBtn = document.getElementById('clear');
 const filter = document.getElementById('filter');
 //6.container
 const container = document.querySelector('.container');
-
-//Function to display items on page load
-function displayItems() {
-  const getItems = getItemsFromStorage();
-  getItems.forEach((item) => addItemToDOM(item));
-}
+//7.form button
+const formBtn = form.querySelector('button');
+let isEditMode = false;
 
 //Function to clear elements
-function clearUI() {
+
+function resetUI() {
   const filter = document.querySelector('#filter');
   filter.value = '';
+  itemInput.value = '';
   const items = document.querySelectorAll('li');
   if (items.length === 0) {
     clrBtn.style.display = 'none';
@@ -30,6 +29,17 @@ function clearUI() {
     clrBtn.style.display = 'block';
     filter.style.display = 'block';
   }
+
+  // //rest form button
+  formBtn.innerHTML = `<i class="fa-solid fa-plus"></i>  Add Item`;
+  formBtn.style.backgroundColor = '#333';
+  isEditMode = false;
+}
+
+//Function to display items on page load
+function displayItems() {
+  const getItems = getItemsFromStorage();
+  getItems.forEach((item) => addItemToDOM(item));
 }
 
 //Function to create new item list
@@ -47,7 +57,7 @@ function addItemToDOM(item) {
 
   //clear the input field
   itemInput.value = '';
-  clearUI();
+  resetUI();
 }
 
 //Function to create icon
@@ -97,6 +107,16 @@ function onAddItemSubmit(e) {
     alert('Please enter value');
     return;
   }
+
+  if (isEditMode) {
+    const removeItem = itemList.querySelector('.edit-mode');
+    // remove from local storage
+    removeItemFromStorage(removeItem.textContent);
+    removeItem.classList.remove('edit-mode');
+    //remove from dom
+    removeItem.remove();
+    //isEditMode = false;
+  }
   addItemToDOM(newItemValue);
   addItemToStorage(newItemValue);
 }
@@ -105,8 +125,24 @@ function onAddItemSubmit(e) {
 function onClickItem(e) {
   if (e.target.classList.contains('fa-solid')) {
     removeItem(e.target.parentElement.parentElement);
+  } else if (e.target.parentElement.classList.contains('items')) {
+    setItemToEdit(e.target);
   }
-  clearUI();
+  //resetUI();
+}
+
+//Function to edit an item
+function setItemToEdit(item) {
+  isEditMode = true;
+  itemList
+    .querySelectorAll('li')
+    .forEach((i) => i.classList.remove('edit-mode'));
+  item.classList.add('edit-mode');
+  console.log(formBtn.innerHTML);
+  formBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item';
+  formBtn.style.backgroundColor = '#008000';
+  console.log(formBtn.innerHTML);
+  itemInput.value = item.textContent;
 }
 
 //Function to remove individual item
@@ -116,7 +152,7 @@ function removeItem(item) {
     item.remove();
     // remove item from storage
     removeItemFromStorage(item.textContent);
-    clearUI();
+    resetUI();
   }
 }
 
@@ -134,7 +170,6 @@ function removeItemFromStorage(item) {
   if (itemFromStorage.length === 0) {
     localStorage.clear();
   }
-  console.log(localStorage.getItem('items'));
 }
 
 //Function to remove all items from storage
@@ -148,7 +183,7 @@ function clearAllItems() {
     itemList.removeChild(itemList.firstChild);
   }
   removeAllItemsFromStorage();
-  clearUI();
+  resetUI();
 }
 
 //Function to filter items
@@ -171,10 +206,10 @@ function init() {
   filter.addEventListener('input', onFilter);
   itemList.addEventListener('click', onClickItem);
   clrBtn.addEventListener('click', clearAllItems);
-  document.addEventListener('DOMContentLoaded', displayItems());
+  document.addEventListener('DOMContentLoaded', displayItems);
 
   //Function to clear UI on page load
-  clearUI();
+  resetUI();
   //
 }
 
