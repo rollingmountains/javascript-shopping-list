@@ -12,6 +12,13 @@ const filter = document.getElementById('filter');
 //6.container
 const container = document.querySelector('.container');
 
+//Function to display items on page load
+function displayItems() {
+  const getItems = getItemsFromStorage();
+  console.log(typeof getItems);
+  // getItems.forEach((item)=> addItemToDOM(item))
+}
+
 //Function to clear elements
 function clearUI() {
   const filter = document.querySelector('#filter');
@@ -24,6 +31,24 @@ function clearUI() {
     clrBtn.style.display = 'block';
     filter.style.display = 'block';
   }
+}
+
+//Function to create new item list
+function addItemToDOM(item) {
+  const newListItem = document.createElement('li');
+  newListItem.appendChild(document.createTextNode(item));
+  //append icon and btn element to new list item
+  const iconButtonElement = newBtn(
+    'fa-solid fa-xmark',
+    'remove-item btn-link text-red'
+  );
+  newListItem.appendChild(iconButtonElement);
+  //append new list item to the 'ul' list at the top
+  itemList.appendChild(newListItem);
+
+  //clear the input field
+  itemInput.value = '';
+  clearUI();
 }
 
 //Function to create icon
@@ -41,38 +66,40 @@ function newBtn(iconClass, btnClass) {
   btn.appendChild(icon);
   return btn;
 }
-//Function to create new item list
-function newListItem() {
-  const newListItem = document.createElement('li');
-  newListItem.appendChild(document.createTextNode(itemInput.value));
-  //append icon and btn element to new list item
-  const iconButtonElement = newBtn(
-    'fa-solid fa-xmark',
-    'remove-item btn-link text-red'
-  );
-  newListItem.appendChild(iconButtonElement);
-  //console.log(itemList);
-  //append new list item to the 'ul' list at the top
-  itemList.appendChild(newListItem);
 
-  //clear the input field
-  itemInput.value = '';
-  clearUI();
+//Function store item in local storage
+function addItemToStorage(item) {
+  const itemInLocalStorage = getItemsFromStorage();
+  itemInLocalStorage.push(item);
+
+  //Store the new item in the storage
+  localStorage.setItem('items', JSON.stringify(itemInLocalStorage));
 }
 
-//Function to alert duplicate item
+//Function to get items from storage
+function getItemsFromStorage() {
+  let itemInLocalStorage;
+
+  if (localStorage.getItem('items') === null) {
+    itemInLocalStorage = [];
+  } else {
+    //Parse existing items form storage and add to array
+    itemInLocalStorage = JSON.parse(localStorage.getItem('items'));
+  }
+  return itemInLocalStorage;
+}
 
 //Function for onSubmit event
-function onSubmit(e) {
+function onAddItemSubmit(e) {
   e.preventDefault();
-  const newItemValue = itemInput.value.toLowerCase();
-  const btnClick = e.target.classList.contains('btn');
+  const newItemValue = itemInput.value;
 
-  if (newItemValue === '' && btnClick) {
+  if (newItemValue === '') {
     alert('Please enter value');
-  } else if (newItemValue !== '' && btnClick) {
-    newListItem();
+    return;
   }
+  addItemToDOM(newItemValue);
+  addItemToStorage(newItemValue);
 }
 
 //Function to remove individual item
@@ -96,11 +123,7 @@ function onBtnClick() {
 function onFilter(e) {
   const li = document.querySelectorAll('li');
   const input = e.target.value.toLowerCase();
-  // console.log(typeof input, input);
-
-  // console.log(li);
   li.forEach((item) => {
-    // console.log(item.innerText.includes('App'));
     if (item.innerText.toLowerCase().includes(input)) {
       item.style.display = 'flex';
     } else {
@@ -109,12 +132,18 @@ function onFilter(e) {
   });
 }
 
-//Add eventListener to elements
-form.addEventListener('click', onSubmit);
-filter.addEventListener('input', onFilter);
-itemList.addEventListener('click', onClick);
-clrBtn.addEventListener('click', onBtnClick);
+//Function to initialise app
+function init() {
+  //Add eventListener to elements
+  form.addEventListener('submit', onAddItemSubmit);
+  filter.addEventListener('input', onFilter);
+  itemList.addEventListener('click', onClick);
+  clrBtn.addEventListener('click', onBtnClick);
+  document.addEventListener('DOMContentLoaded', displayItems());
 
-//Function to clear UI on page load
-clearUI();
-//
+  //Function to clear UI on page load
+  clearUI();
+  //
+}
+
+init();
