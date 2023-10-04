@@ -121,6 +121,7 @@ function onAddItemSubmit(e) {
     const removeItem = itemList.querySelector('.edit-mode');
     if (checkDuplicate(newItemValue.toLowerCase())) {
       alert('Item already exists');
+      itemInput = '';
       return;
     } else {
       // remove from local storage
@@ -132,6 +133,7 @@ function onAddItemSubmit(e) {
     }
   } else if (checkDuplicate(newItemValue.toLowerCase())) {
     alert('Item already exists');
+    itemInput = '';
     return;
   }
 
