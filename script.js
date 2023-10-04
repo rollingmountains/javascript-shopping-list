@@ -42,6 +42,22 @@ function displayItems() {
   getItems.forEach((item) => addItemToDOM(item));
 }
 
+//Function to create icon
+function newIcon(iconClass) {
+  const i = document.createElement('i');
+  i.className = iconClass;
+  return i;
+}
+//Function to create button
+function newBtn(iconClass, btnClass) {
+  const btn = document.createElement('btn');
+  btn.className = btnClass;
+  //append icon element to button
+  const icon = newIcon(iconClass);
+  btn.appendChild(icon);
+  return btn;
+}
+
 //Function to create new item list
 function addItemToDOM(item) {
   const newListItem = document.createElement('li');
@@ -57,23 +73,8 @@ function addItemToDOM(item) {
 
   //clear the input field
   itemInput.value = '';
+  //console.log(newListItem.textContent);
   resetUI();
-}
-
-//Function to create icon
-function newIcon(iconClass) {
-  const i = document.createElement('i');
-  i.className = iconClass;
-  return i;
-}
-//Function to create button
-function newBtn(iconClass, btnClass) {
-  const btn = document.createElement('btn');
-  btn.className = btnClass;
-  //append icon element to button
-  const icon = newIcon(iconClass);
-  btn.appendChild(icon);
-  return btn;
 }
 
 //Function store item in local storage
@@ -98,6 +99,14 @@ function getItemsFromStorage() {
   return itemInLocalStorage;
 }
 
+//Function to check duplicate
+function checkDuplicate(item) {
+  const itemsFromLocalStorage = getItemsFromStorage();
+  const itemsInLowerCase = itemsFromLocalStorage.map((i) => i.toLowerCase());
+  // itemsFromLocalStorage.forEach((item) => item.toLowerCase)
+  return itemsInLowerCase.includes(item);
+}
+
 //Function for onSubmit event
 function onAddItemSubmit(e) {
   e.preventDefault();
@@ -110,13 +119,22 @@ function onAddItemSubmit(e) {
 
   if (isEditMode) {
     const removeItem = itemList.querySelector('.edit-mode');
-    // remove from local storage
-    removeItemFromStorage(removeItem.textContent);
-    removeItem.classList.remove('edit-mode');
-    //remove from dom
-    removeItem.remove();
-    //isEditMode = false;
+    if (checkDuplicate(newItemValue.toLowerCase())) {
+      alert('Item already exists');
+      return;
+    } else {
+      // remove from local storage
+      removeItemFromStorage(removeItem.textContent);
+      removeItem.classList.remove('edit-mode');
+      //remove from dom
+      removeItem.remove();
+      //isEditMode = false;
+    }
+  } else if (checkDuplicate(newItemValue.toLowerCase())) {
+    alert('Item already exists');
+    return;
   }
+
   addItemToDOM(newItemValue);
   addItemToStorage(newItemValue);
 }
@@ -138,10 +156,8 @@ function setItemToEdit(item) {
     .querySelectorAll('li')
     .forEach((i) => i.classList.remove('edit-mode'));
   item.classList.add('edit-mode');
-  console.log(formBtn.innerHTML);
   formBtn.innerHTML = '<i class="fa-solid fa-pen"></i>  Update Item';
   formBtn.style.backgroundColor = '#008000';
-  console.log(formBtn.innerHTML);
   itemInput.value = item.textContent;
 }
 
